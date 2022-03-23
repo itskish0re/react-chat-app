@@ -1,5 +1,6 @@
 import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import Redirect from '../helperfunctions/Redirect';
 
 const PublicRoute = ({ children, ...routeProps }) => {
   const profile = false;
