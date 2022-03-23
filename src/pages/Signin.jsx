@@ -1,6 +1,21 @@
 import React from "react";
 import { Icon } from "@rsuite/icons"
-import { Container, Grid, Row, Panel, Col, Button, toaster } from 'rsuite';
+import {
+  Container,
+  Grid,
+  Row,
+  Panel,
+  Col,
+  Button,
+  toaster,
+  Notification } from 'rsuite';
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo
+} from 'firebase/auth';
+import { auth, database } from '../misc/firebase';
+import { ref, serverTimestamp, set } from 'firebase/database';
 
 const googlesvg = (prop) => {
   return (
@@ -14,6 +29,31 @@ const googlesvg = (prop) => {
 }
 
 const SignIn = () => {
+  const signInWithProvider = async (provider) => {
+      const credential = await signInWithPopup(auth, provider);
+      const userMeta = getAdditionalUserInfo(credential);
+
+      if(userMeta.isNewUser){
+        await set(ref(database,`/profiles/${credential.user.uid}`),{
+          name: credential.user.displayName,
+          createdAt: serverTimestamp(),
+        });
+      }
+  }
+  const onGoogleSignIn = () => {
+    signInWithProvider(new GoogleAuthProvider()).then(() => {
+      toaster.push(<Notification>Signed in</Notification>, {
+        type: 'success',
+        placement: 'topCenter'
+      });
+    }).catch((err) => {
+      toaster.push(<Notification>{err.message}</Notification>, {
+        type: 'error',
+        placement: 'topCenter'
+      });
+    });
+  }
+
   return (
     <Container>
       <Grid className="mt-page">
@@ -25,7 +65,7 @@ const SignIn = () => {
                 <p>Progressive chat platform for neophytes</p>
               </div>
               <div className="mt-3">
-                <Button block color="green" >
+                <Button block color="green" onClick={onGoogleSignIn} >
                 <span style={{'margin': '0 3px','alignContent': 'center'}}><Icon as={googlesvg}/></span>
                   Continue with Google
                 </Button>
