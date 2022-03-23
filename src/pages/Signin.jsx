@@ -32,6 +32,8 @@ const SignIn = () => {
   const signInWithProvider = async (provider) => {
       const credential = await signInWithPopup(auth, provider);
       const userMeta = getAdditionalUserInfo(credential);
+      console.log(credential);
+      console.log(userMeta);
 
       if(userMeta.isNewUser){
         await set(ref(database,`/profiles/${credential.user.uid}`),{
@@ -39,16 +41,19 @@ const SignIn = () => {
           createdAt: serverTimestamp(),
         });
       }
+      return {
+        name: credential.user.displayName,
+        isNewUser: userMeta.isNewUser
+      };
   }
+
   const onGoogleSignIn = () => {
-    signInWithProvider(new GoogleAuthProvider()).then(() => {
-      toaster.push(<Notification>Signed in</Notification>, {
-        type: 'success',
+    signInWithProvider(new GoogleAuthProvider()).then(({name, isNewUser}) => {
+      toaster.push(<Notification type="success" header={`${isNewUser?"Signed in as ":"Logged in as "}${name}`} />, {
         placement: 'topCenter'
       });
     }).catch((err) => {
-      toaster.push(<Notification>{err.message}</Notification>, {
-        type: 'error',
+      toaster.push(<Notification type="info" header={err.message} />, {
         placement: 'topCenter'
       });
     });
