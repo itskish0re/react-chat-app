@@ -1,22 +1,18 @@
 import React from "react";
-import { Routes } from "react-router";
+import { Routes, Route } from "react-router";
 import "rsuite/dist/rsuite.min.css";
 import "./styles/main.scss"
-import PublicRoute from './components/PublicRoute';
-import PrivateRoute from './components/PrivateRoute';
 import SignIn from './pages/Signin';
 import Home from './pages/Home';
+import Redirect from './helperfunctions/Redirect';
 
+const profile = false;
 
 function App() {
   return (
     <Routes>
-        <PublicRoute path="/signin">
-          <SignIn/>
-        </PublicRoute>
-        <PrivateRoute path="/">
-          <Home/>
-        </PrivateRoute>
+      <Route path="/" element={(!profile) ? <Redirect to="/signin" /> : <Home/> } />
+      <Route path="/signin" element={(profile) ? <Redirect to="/" /> : <SignIn/> } />
     </Routes>
   );
 }
