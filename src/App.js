@@ -5,15 +5,26 @@ import "./styles/main.scss"
 import SignIn from './pages/Signin';
 import Home from './pages/Home';
 import Redirect from './helperfunctions/Redirect';
+import {ProfileProvider, useProfile} from './contexts/profile.context';
+import { Container, Loader } from 'rsuite';
 
-const profile = false;
 
 function App() {
+  const {profile, isLoading} = useProfile();
+
   return (
-    <Routes>
-      <Route path="/" element={(!profile) ? <Redirect to="/signin" /> : <Home/> } />
-      <Route path="/signin" element={(profile) ? <Redirect to="/" /> : <SignIn/> } />
-    </Routes>
+    <ProfileProvider>
+      <Routes>
+        <Route path="/" element={
+          (isLoading && !profile) ? (<Container>
+            <Loader center vertical size="md" content="Loading" speed="slow"/>
+          </Container>): (!profile && !isLoading) ? <Redirect to="/signin" /> : <Home/> } />
+        <Route path="/signin" element={
+          (isLoading && !profile) ? (<Container>
+              <Loader center vertical size="md" content="Loading" speed="slow"/>
+            </Container>): (profile && !isLoading) ? <Redirect to="/" /> : <SignIn/> } />
+      </Routes>
+    </ProfileProvider>
   );
 }
 
