@@ -36,14 +36,14 @@ export const ProfileProvider = ({ children }) => {
             email: authObj.email,
           };
           setProfile(data);
-          setIsLoading(() => false);
+          setIsLoading(false);
         });
       } else {
         if (userRef) {
           off(userRef);
         }
         setProfile(null);
-        setIsLoading(() => false);
+        setIsLoading(false);
       }
     });
     return () => {

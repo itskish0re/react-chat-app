@@ -11,7 +11,7 @@ const DashboardToggle = () => {
       <Button block color="blue" onClick={open}>
         Dashboard
       </Button>
-      <Drawer show={isOpen} onHide={close} placement="left">
+      <Drawer open={isOpen} onClose={close} placement="left">
         <Dashboard />
       </Drawer>
     </>
