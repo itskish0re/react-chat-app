@@ -4,21 +4,30 @@ import React, {
   useContext,
   useEffect,
 } from 'react';
+import {
+  // serverTimestamp,
+  ref,
+  onValue,
+  // onDisconnect,
+  // set,
+  off
+} from "firebase/database";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth, database } from '../misc/firebase';
 
-const ProfileContext = createContext('');
+const ProfileContext = createContext({});
 
 export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     let userRef;
+    // let userStatusRef;
 
-    const authUnsub = auth.onAuthStateChanged(authObj => {
+    const authUnsub = onAuthStateChanged(auth, (authObj) => {
       if (authObj) {
-        userRef = database.ref(`/profiles/${authObj.uid}`);
-        userRef.on('value', (snap) => {
+        userRef = ref(database,`/profiles/${authObj.uid}`);
+        onValue(userRef, (snap) => {
           const { name, createdAt } = snap.val();
           const data = {
             name,
@@ -27,23 +36,24 @@ export const ProfileProvider = ({ children }) => {
             email: authObj.email,
           };
           setProfile(data);
-          setIsLoading(false);
+          setIsLoading(() => false);
         });
       } else {
         if (userRef) {
-          userRef.off();
+          off(userRef);
         }
         setProfile(null);
-        setIsLoading(false);
+        setIsLoading(() => false);
       }
     });
     return () => {
       authUnsub();
       if (userRef) {
-        userRef.off();
+        off(userRef);
       }
     };
   }, []);
+
   return (
     <ProfileContext.Provider value={{ isLoading, profile }}>
       {children}

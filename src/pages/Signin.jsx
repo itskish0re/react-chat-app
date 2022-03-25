@@ -32,8 +32,6 @@ const SignIn = () => {
   const signInWithProvider = async (provider) => {
       const credential = await signInWithPopup(auth, provider);
       const userMeta = getAdditionalUserInfo(credential);
-      console.log(credential);
-      console.log(userMeta);
 
       if(userMeta.isNewUser){
         await set(ref(database,`/profiles/${credential.user.uid}`),{
